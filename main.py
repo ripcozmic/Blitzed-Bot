@@ -11,6 +11,7 @@ with open(conf, 'r') as c:
     config = json.load(c)
 
 token = config["bot"]["TOKEN"]
+logging = config["bot"]["logging"]
 
 bot = commands.Bot(command_prefix="!", help_command=None, intents=discord.Intents.all())
 
@@ -32,6 +33,6 @@ async def load_cogs():
 async def main():
     async with bot:
         await load_cogs()
-        await bot.start(config.TOKEN)
+        await bot.start(token)
 
-asyncio.run(main)
+asyncio.run(main())

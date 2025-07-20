@@ -1,0 +1,8 @@
+{
+    "database": {
+        "file": "urbase.db"
+    },
+    "bot": {
+        "TOKEN": ""
+    }   
+}
