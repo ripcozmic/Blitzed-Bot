@@ -141,10 +141,43 @@ class Moderation(commands.Cog):
         embed.add_field(name="Moderator", value=f"```{mod_name} (UID: {mod_id})```", inline=True)
         embed.add_field(name="Date and Time", value=f"```{timestamp}```", inline=True)
         embed.add_field(name="Reason", value=f"```{reason}```", inline=True)
-        embed.add_field(name="Unique Ban ID", value=f"```{unique_id}```", inline=True)
+        embed.add_field(name="Unique Kick ID", value=f"```{unique_id}```", inline=True)
 
         try:
-            interaction.response.send_message(embed=embed)
+            await interaction.response.send_message(embed=embed)
+        except Exception as e:
+            print(f"Failed! {e}")
+
+    @app_commands.command(name="checkban", description="Checks a ban")
+    @app_commands.describe(unique_id="Unique Ban ID, only works with this bot.")
+    async def checkban(self, interaction: discord.Interaction, unique_id: str):
+        member = interaction.guild.get_member(interaction.user.id)
+        if 1396507757728759892 not in [role.id for role in member.roles]:
+            await interaction.response.send_message(":x: You are not a guard.", ephemeral=True)
+            return
+        
+        self.cursor.execute(
+            "SELECT user_id, moderator_id, reason, timestamp FROM bans WHERE unique_id = ?",
+            (unique_id,))
+        record = self.cursor.fetchone()
+
+        uid, mod_id, reason, timestamp = record
+
+        user = await self.bot.fetch_user(uid)
+        name = user.name
+
+        mod = await self.bot.fetch_user(mod_id)
+        mod_name = mod.name
+
+        embed = discord.Embed(colour=0xFF2222, title=f":white_check_mark: Check ban @ {interaction.guild.name}", description=f"You are checking a ban in {interaction.guild.name}. If you believe that this was a false ban, you can unban the user.")
+        embed.add_field(name="User", value=f"```{name} (UID: {uid})```", inline=True)
+        embed.add_field(name="Moderator", value=f"```{mod_name} (UID: {mod_id})```", inline=True)
+        embed.add_field(name="Date and Time", value=f"```{timestamp}```", inline=True)
+        embed.add_field(name="Reason", value=f"```{reason}```", inline=True)
+        embed.add_field(name="Unique Kick ID", value=f"```{unique_id}```", inline=True)
+
+        try:
+            await interaction.response.send_message(embed=embed)
         except Exception as e:
             print(f"Failed! {e}")
 
